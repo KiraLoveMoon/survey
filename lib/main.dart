@@ -103,136 +103,123 @@ class _SurveyFormState extends State<SurveyForm> {
                   });
                 },
               ),
-              Text('單選題：'),
+              Text('單選題、多選題或問答題：'),
               Column(
-                children: questions
-                    .where((question) => question.type == QuestionType.singleChoice)
-                    .map((question) {
+                children: questions.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final question = entry.value;
                   return Column(
                     children: [
+                      Text('問題 ${index + 1}：'),
                       Text(question.text),
-                      Column(
-                        children: question.choices.map((choice) {
-                          if (choice == '其他') {
-                            return Column(
-                              children: [
-                                RadioListTile<String>(
-                                  title: Text(choice),
-                                  value: choice,
-                                  groupValue: question.selectedChoice,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      question.selectedChoice = value;
-                                    });
-                                  },
-                                ),
-                                if (question.selectedChoice == choice)
-                                  TextFormField(
-                                    decoration: InputDecoration(
-                                      labelText: '其他，請填寫：',
-                                    ),
+                      if (question.type == QuestionType.singleChoice) ...[
+                        Column(
+                          children: question.choices.map((choice) {
+                            if (choice == '其他') {
+                              return Column(
+                                children: [
+                                  RadioListTile<String>(
+                                    title: Text(choice),
+                                    value: choice,
+                                    groupValue: question.selectedChoice,
                                     onChanged: (value) {
-                                      question.otherText = value;
+                                      setState(() {
+                                        question.selectedChoice = value;
+                                      });
                                     },
                                   ),
-                              ],
-                            );
-                          } else {
-                            return RadioListTile<String>(
-                              title: Text(choice),
-                              value: choice,
-                              groupValue: question.selectedChoice,
-                              onChanged: (value) {
-                                setState(() {
-                                  question.selectedChoice = value;
-                                });
-                              },
-                            );
-                          }
-                        }).toList(),
-                      ),
-                      Divider(),
-                    ],
-                  );
-                }).toList(),
-              ),
-              Text('多選題：'),
-              Column(
-                children: questions
-                    .where((question) => question.type == QuestionType.multiChoice)
-                    .map((question) {
-                  return Column(
-                    children: [
-                      Text(question.text),
-                      Column(
-                        children: question.choices.map((choice) {
-                          if (choice == '其他') {
-                            return Column(
-                              children: [
-                                CheckboxListTile(
-                                  title: Text(choice),
-                                  value: question.selectedChoices.contains(choice),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value != null) {
-                                        if (value) {
-                                          question.selectedChoices.add(choice);
-                                        } else {
-                                          question.selectedChoices.remove(choice);
+                                  if (question.selectedChoice == choice)
+                                    TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: '其他，請填寫：',
+                                      ),
+                                      onChanged: (value) {
+                                        question.otherText = value;
+                                      },
+                                    ),
+                                ],
+                              );
+                            } else {
+                              return RadioListTile<String>(
+                                title: Text(choice),
+                                value: choice,
+                                groupValue: question.selectedChoice,
+                                onChanged: (value) {
+                                  setState(() {
+                                    question.selectedChoice = value;
+                                  });
+                                },
+                              );
+                            }
+                          }).toList(),
+                        ),
+                      ] else if (question.type == QuestionType.multiChoice) ...[
+                        Column(
+                          children: question.choices.map((choice) {
+                            if (choice == '其他') {
+                              return Column(
+                                children: [
+                                  CheckboxListTile(
+                                    title: Text(choice),
+                                    value: question.selectedChoices.contains(choice),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        if (value != null) {
+                                          if (value) {
+                                            question.selectedChoices.add(choice);
+                                          } else {
+                                            question.selectedChoices.remove(choice);
+                                          }
                                         }
-                                      }
-                                    });
-                                  },
-                                ),
-                                if (question.selectedChoices.contains(choice))
-                                  TextFormField(
-                                    decoration: InputDecoration(
-                                      labelText: '其他，請填寫：',
-                                    ),
-                                    onChanged: (value) {
-                                      question.otherText = value;
+                                      });
                                     },
                                   ),
-                              ],
-                            );
-                          } else {
-                            return CheckboxListTile(
-                              title: Text(choice),
-                              value: question.selectedChoices.contains(choice),
-                              onChanged: (value) {
-                                setState(() {
-                                  if (value != null) {
-                                    if (value) {
-                                      question.selectedChoices.add(choice);
-                                    } else {
-                                      question.selectedChoices.remove(choice);
+                                  if (question.selectedChoices.contains(choice))
+                                    TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: '其他，請填寫：',
+                                      ),
+                                      onChanged: (value) {
+                                        question.otherText = value;
+                                      },
+                                    ),
+                                ],
+                              );
+                            } else {
+                              return CheckboxListTile(
+                                title: Text(choice),
+                                value: question.selectedChoices.contains(choice),
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value != null) {
+                                      if (value) {
+                                        question.selectedChoices.add(choice);
+                                      } else {
+                                        question.selectedChoices.remove(choice);
+                                      }
                                     }
-                                  }
-                                });
-                              },
-                            );
-                          }
-                        }).toList(),
-                      ),
-                      Divider(),
-                    ],
-                  );
-                }).toList(),
-              ),
-              Text('問答題：'),
-              Column(
-                children: questions
-                    .where((question) => question.type == QuestionType.text)
-                    .map((question) {
-                  return Column(
-                    children: [
-                      Text(question.text),
-                      TextField(
-                        onChanged: (value) {
+                                  });
+                                },
+                              );
+                            }
+                          }).toList(),
+                        ),
+                      ] else if (question.type == QuestionType.text) ...[
+                        TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              question.textAnswer = value;
+                            });
+                          },
+                        ),
+                      ],
+                      ElevatedButton(
+                        onPressed: () {
                           setState(() {
-                            question.textAnswer = value;
+                            questions.removeAt(index);
                           });
                         },
+                        child: Text('刪除問題'),
                       ),
                       Divider(),
                     ],
